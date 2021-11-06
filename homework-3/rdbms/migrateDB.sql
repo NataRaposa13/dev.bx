@@ -22,3 +22,9 @@ CREATE TABLE movie_title
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
 );
+
+INSERT INTO language(ID, NAME)
+VALUES ('ru', 'Russian'),
+       ('en', 'English'),
+       ('fr', 'French'),
+       ('de', 'German');
