@@ -31,3 +31,5 @@ VALUES ('ru', 'Russian'),
 
 INSERT INTO movie_title(MOVIE_ID, LANGUAGE_ID, TITLE)
 SELECT ID, 'ru', TITLE from movie;
+
+ALTER TABLE movie DROP TITLE;
