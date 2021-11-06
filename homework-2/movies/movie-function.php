@@ -17,3 +17,8 @@ function printSelectMoviesByAge(int $age, array $movies): void
 		}
 	}
 }
+
+function formatMovie(int $index, array $movie): string
+{
+	return "{$index}. {$movie['title']} ({$movie['release_year']}), {$movie['age_restriction']}+. Rating - {$movie['rating']}";
+}
