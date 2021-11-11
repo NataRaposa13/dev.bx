@@ -87,3 +87,21 @@ FROM actor a
          INNER JOIN genre g on mg.GENRE_ID = g.ID
 GROUP BY 1, 2
 ORDER BY 1, 3 DESC;
+
+SELECT a.NAME,
+       g.NAME,
+       COUNT(g.NAME)
+FROM actor a
+         INNER JOIN movie_actor ma on a.ID = ma.ACTOR_ID
+         INNER JOIN movie m on ma.MOVIE_ID = m.ID
+         INNER JOIN movie_genre mg on m.ID = mg.MOVIE_ID
+         INNER JOIN genre g on mg.GENRE_ID = g.ID
+GROUP BY 1, 2
+HAVING COUNT(g.NAME) = (SELECT COUNT(g2.NAME)
+                         FROM actor a2
+                                  INNER JOIN movie_actor ma2 on a2.ID = ma2.ACTOR_ID
+                                  INNER JOIN movie m2 on ma2.MOVIE_ID = m2.ID
+                                  INNER JOIN movie_genre mg2 on m2.ID = mg2.MOVIE_ID
+                                  INNER JOIN genre g2 on mg2.GENRE_ID = g2.ID
+                         GROUP BY a2.NAME, g2.NAME
+                         ORDER BY COUNT(g2.NAME) DESC LIMIT 1);
