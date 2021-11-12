@@ -18,3 +18,15 @@ function getMoviesById(array $movies, int $id): array
 	}
 	return [];
 }
+
+function getGenreList(array $genres): string
+{
+	$result = '';
+	foreach ($genres as $genre)
+	{
+		$result	.= $genre . ", ";
+	}
+
+	$result = mb_substr( $result,0, -2, 'UTF-8');
+	return mb_strlen($result, 'UTF-8') <= 30? $result : formatMessage($result, 27);
+}
