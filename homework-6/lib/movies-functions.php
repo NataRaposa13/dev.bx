@@ -30,3 +30,16 @@ function getGenreList(array $genres): string
 	$result = mb_substr( $result,0, -2, 'UTF-8');
 	return mb_strlen($result, 'UTF-8') <= 30? $result : formatMessage($result, 27);
 }
+
+function movieRectangleRating(int $i, float $rating): string
+{
+	{
+		if ($i<=$rating){
+			return '<div style= "background:#E78818;"  class="rating-rectangle"></div>';
+		}
+		else
+		{
+			return '<div class="rating-rectangle"></div>';
+		}
+	}
+}
