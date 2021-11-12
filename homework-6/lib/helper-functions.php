@@ -19,3 +19,8 @@ function formatMessage(string $text, int $textLength = 10): string
 
 	return $text;
 }
+
+function getFileName($path): string
+{
+	return basename($path, ".php");
+}
