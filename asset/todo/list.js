@@ -48,6 +48,7 @@ export class List
 	createItem(itemData)
 	{
 		itemData.deleteButtonHandler = this.handleDeleteButtonClick.bind(this);
+		itemData.editButtonHandler = this.handleEditButtonClick.bind(this);
 		return new Item(itemData);
 	}
 
@@ -61,6 +62,23 @@ export class List
 				this.renderItems();
 			}).catch((error) => {
 				console.error('Error trying to delete item');
+			})
+		}
+	}
+
+	handleEditButtonClick(item)
+	{
+		const index = this.items.indexOf(item);
+		if (index > -1)
+		{
+			confirm("Вы хотите изменить задачу?");
+			const newItem = prompt('Введите текст новой задачи.', this.items[index]['title'])
+			this.items.splice(index, 1, this.createItem({title: newItem}));
+
+			this.save().then(() => {
+				this.renderItems();
+			}).catch((error) => {
+				console.error('Error trying to edit item');
 			})
 		}
 	}
