@@ -71,8 +71,13 @@ export class List
 		const index = this.items.indexOf(item);
 		if (index > -1)
 		{
-			confirm("Вы хотите изменить задачу?");
 			const newItem = prompt('Введите текст новой задачи.', this.items[index]['title'])
+
+			if (newItem === null)
+			{
+				return;
+			}
+
 			this.items.splice(index, 1, this.createItem({title: newItem}));
 
 			this.save().then(() => {
