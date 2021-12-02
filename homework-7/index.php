@@ -8,6 +8,9 @@ require_once "./data/movies.php";
 require_once "./lib/template-functions.php";
 require_once "./lib/helper-functions.php";
 require_once "./lib/movies-functions.php";
+require_once "./data/db.php";
+
+$database = connectToDB($config['db']);
 
 // genre filtering
 if (isset($_GET['genre']) && in_array($_GET['genre'], array_values($genres)))
