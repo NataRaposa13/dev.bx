@@ -9,16 +9,17 @@ require_once "./lib/template-functions.php";
 require_once "./lib/helper-functions.php";
 require_once "./lib/movies-functions.php";
 
-if (!isset($_GET['id']))
+$path = "./resources/pages/movies-list.php";
+
+if (isset($_GET['id']) && in_array((int)$_GET['id'], getAllValuesByKey($movies, 'id')))
 {
-	return;
+	$path = "./resources/pages/movie-details.php";
+	$id = (int)$_GET['id'];
+	$movies = getMoviesById($movies, $id);
 }
 
-$id = (int)$_GET['id'];
-$movies = getMoviesById($movies, $id);
-
 // prepare page content
-$moviesListPage = renderTemplate("./resources/pages/movie-details.php",
+$moviesListPage = renderTemplate($path,
 	[
 		'movies' => $movies
 	]
