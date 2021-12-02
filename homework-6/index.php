@@ -27,6 +27,7 @@ renderLayout($moviesListPage,
 	[
 		'config' => $config,
 		'genres' => $genres,
-		'currentPage' => getFileName(__FILE__)
+		'currentPage' => getFileName(__FILE__),
+		'get' => $_GET
 	]
 );
