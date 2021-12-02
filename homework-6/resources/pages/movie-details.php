@@ -18,7 +18,7 @@
 		<div class="wrapper-data-about-movie">
 			<div class="wrapper-about-movie-rating">
 				<?php for ($i = 1; $i <= 10; $i++): ?>
-					<?= movieRectangleRating($i, $movies['rating']) ?>
+					<?= createRectangleByMoviesRating($i, $movies['rating']) ?>
 				<?php endfor; ?>
 				<div class="rating-ellipse"><?= sprintf('%0.1f', $movies['rating']) ?></div>
 			</div>

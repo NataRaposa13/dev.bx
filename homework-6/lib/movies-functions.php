@@ -38,7 +38,7 @@ function formatGenreList(array $genres): string
 	return mb_strlen($result, 'UTF-8') <= 30? $result : formatMessage($result, 27);
 }
 
-function movieRectangleRating(int $i, float $rating): string
+function createRectangleByMoviesRating(int $i, float $rating): string
 {
 	{
 		if ($i<=$rating){
