@@ -30,22 +30,6 @@
 	max-height: 416px;
 }
 
-.menu::-webkit-scrollbar {
-	width: 10px;
-	background-color: #383838;
-}
-
-.menu::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-	background-color: #18aaaa;
-}
-
-.menu::-webkit-scrollbar-track {
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
-	border-radius: 10px;
-	background-color: #f9f9fd;
-}
-
 .menu-item {
 	display: block;
 	border-bottom: 1px solid rgba(242, 242, 242, 0.1);
@@ -312,4 +296,27 @@
 
 .movie-list--item:hover .movie-list--item-overlap {
 	opacity: 1;
+}
+
+
+/*стиль прокрутки*/
+
+::-webkit-scrollbar {
+	width: 10px;
+	background-color: #CCCCCC;
+}
+
+.menu::-webkit-scrollbar {
+	background-color: #383838;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: #43B0ED;
+}
+
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+	border-radius: 10px;
+	background-color: #f9f9fd;
 }
