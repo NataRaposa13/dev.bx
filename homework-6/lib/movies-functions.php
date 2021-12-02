@@ -32,15 +32,9 @@ function getAllValuesByKey(array $movies, string $key): array
 	return $result;
 }
 
-function getGenreList(array $genres): string
+function formatGenreList(array $genres): string
 {
-	$result = '';
-	foreach ($genres as $genre)
-	{
-		$result	.= $genre . ", ";
-	}
-
-	$result = mb_substr( $result,0, -2, 'UTF-8');
+	$result = implode(", ", array_values($genres));
 	return mb_strlen($result, 'UTF-8') <= 30? $result : formatMessage($result, 27);
 }
 
