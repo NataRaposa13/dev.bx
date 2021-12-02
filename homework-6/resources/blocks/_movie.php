@@ -16,7 +16,7 @@
 			<?=$movie['duration'].' мин.'.' / '.date('h:i', mktime(0,$movie['duration']))?>
 		</div>
 		<div class="movie-list--item-genre">
-				<div><?= getGenreList($movie['genres']) ?></div>
+				<div><?= formatGenreList($movie['genres']) ?></div>
 		</div>
 	</div>
 	<div class="movie-list--item-overlap">
