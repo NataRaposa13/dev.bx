@@ -9,14 +9,18 @@ require_once "./lib/template-functions.php";
 require_once "./lib/helper-functions.php";
 require_once "./lib/movies-functions.php";
 
-$id = (int)$_GET['id'];
+if (!isset($_GET['id']))
+{
+	return;
+}
 
-$currentMovie = getMoviesById($movies, $id);
+$id = (int)$_GET['id'];
+$movies = getMoviesById($movies, $id);
 
 // prepare page content
 $moviesListPage = renderTemplate("./resources/pages/movie-details.php",
 	[
-		'currentMovie' => $currentMovie
+		'movies' => $movies
 	]
 );
 
