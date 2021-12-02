@@ -3,6 +3,7 @@
 /** @var array $genres */
 /** @var string $content */
 /** @var string $currentPage */
+/** @var array $get */
 ?>
 
 <!doctype html>
@@ -22,11 +23,11 @@
 	<div class="sidebar">
 		<div class="sidebar-logotype" style="background-image: url(./resources/images/img-tex/BITFLIX.svg);"></div>
 		<ul class="menu">
-			<li class="menu-item <?= $currentPage === 'index' ? "menu-item--active" : "" ?>">
+			<li class="menu-item <?= $currentPage === 'index' && $get['genre'] === null ? "menu-item--active" : "" ?>">
 				<a href="<?= "index" . ".php"?>"><?= $config['menu']['index'] ?></a>
 			</li>
 			<?php foreach ($genres as $code => $name): ?>
-				<li class="menu-item <?= $currentPage === "index.php" . "?genre=" . $name ? "menu-item--active" : "" ?>">
+				<li class="menu-item <?= $get['genre'] === $name ? "menu-item--active" : "" ?>">
 					<a href="<?= "index.php" . "?genre=" . $name?>"><?= $name ?></a>
 				</li>
 			<?php endforeach; ?>
