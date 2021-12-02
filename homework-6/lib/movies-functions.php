@@ -19,6 +19,19 @@ function getMoviesById(array $movies, int $id): array
 	return [];
 }
 
+function getAllValuesByKey(array $movies, string $key): array
+{
+	$result = [];
+	foreach ($movies as $movie)
+	{
+		if(array_key_exists($key, $movie))
+		{
+			$result[] = $movie[$key];
+		}
+	}
+	return $result;
+}
+
 function getGenreList(array $genres): string
 {
 	$result = '';
