@@ -19,11 +19,10 @@ if (isset($_GET['genre']) && in_array($_GET['genre'], array_values(getListCodeGe
 	$movies = getListMovies($database, $pdo, $genres, $_GET['genre']);
 }
 
-
 // prepare page content
 $moviesListPage = renderTemplate("./resources/pages/movies-list.php",
 	[
-		'movies' => $movies
+		'movies' => getListMoviesWithGenres($movies, $genres)
 	]
 );
 

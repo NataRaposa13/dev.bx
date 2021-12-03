@@ -11,6 +11,7 @@ $database = connectToDB($config['db']);
 $pdo = connectPDO($config['db']);
 
 $genres = getListGenres($database, $pdo);
+$actors = getListActors($database, $pdo);
 $movies = getListMovies($database, $pdo, $genres);
 
 $path = "./resources/pages/movies-list.php";
@@ -26,7 +27,7 @@ if (isset($_GET['id']) && in_array((int)$_GET['id'], getAllValuesByKey($movies, 
 // prepare page content
 $moviesListPage = renderTemplate($path,
 	[
-		'movies' => $movies
+		'movies' => getListMoviesWithActors($movies, $actors)
 	]
 );
 
