@@ -1,5 +1,25 @@
 <?php
 
+function getListGenres(mysqli $database, PDO $pdo, $page = 1, $pageSize = 50): array
+{
+	$query = "SELECT * FROM genre";
+
+	$offset = $pageSize * ($page - 1);
+	$limit = $pageSize;
+	$query .= " LIMIT {$limit} OFFSET {$offset}";
+
+	$result = $pdo->query($query);
+	if (!$result)
+	{
+		trigger_error($database->error, E_USER_ERROR);
+	}
+
+	return $result->fetchAll(PDO::FETCH_UNIQUE);
+}
+
+
+//общие функции
+
 function getMoviesByGenres(array $movies, string $genre): array
 {
 	return array_filter($movies, function($movie) use ($genre){
