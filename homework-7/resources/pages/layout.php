@@ -26,9 +26,9 @@
 			<li class="menu-item <?= $currentPage === 'index' && $get['genre'] === null ? "menu-item--active" : "" ?>">
 				<a href="<?= "index" . ".php"?>"><?= $config['menu']['index'] ?></a>
 			</li>
-			<?php foreach ($genres as $code => $name): ?>
-				<li class="menu-item <?= $get['genre'] === $name ? "menu-item--active" : "" ?>">
-					<a href="<?= "index.php" . "?genre=" . $name?>"><?= $name ?></a>
+			<?php foreach ($genres as $genre): ?>
+				<li class="menu-item <?= $get['genre'] === $genre['NAME'] ? "menu-item--active" : "" ?>">
+					<a href="<?= "index.php" . "?genre=" . $genre['NAME']?>"><?= $genre['NAME'] ?></a>
 				</li>
 			<?php endforeach; ?>
 			<li class="menu-item <?= $currentPage === 'favorites' ? "menu-item--active" : "" ?>">
