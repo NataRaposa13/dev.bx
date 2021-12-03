@@ -17,27 +17,105 @@ function getListGenres(mysqli $database, PDO $pdo, $page = 1, $pageSize = 50): a
 	return $result->fetchAll(PDO::FETCH_UNIQUE);
 }
 
+function getListCodeGenres(mysqli $database, PDO $pdo): array
+{
+	$query = "SELECT CODE FROM genre";
+
+	$result = $pdo->query($query);
+	if (!$result)
+	{
+		trigger_error($database->error, E_USER_ERROR);
+	}
+
+	return $result->fetchAll(PDO::FETCH_COLUMN);
+}
+
+function getListMovies(mysqli $database, PDO $pdo, array $genres, string $genre = null): array
+{
+	if ($genre === null)
+	{
+		$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
+       			         (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
+       					 (SELECT GROUP_CONCAT(ACTOR_ID) FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
+				  FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID";
+	}
+	else
+	{
+		$genre = mysqli_real_escape_string($database, $genre);
+		$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
+       					 (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
+       			 		 (SELECT GROUP_CONCAT(ACTOR_ID) FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
+				  FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID
+             				   INNER JOIN movie_genre mg ON m.ID = mg.MOVIE_ID
+             				   INNER JOIN genre g on mg.GENRE_ID = g.ID
+             	  WHERE CODE = '{$genre}'";
+	}
+
+	$result = $pdo->query($query);
+	if (!$result)
+	{
+		trigger_error($database->error, E_USER_ERROR);
+	}
+
+	return getListMoviesWithGenres($result->fetchAll(PDO::FETCH_ASSOC), $genres);
+}
+
+function getListMoviesWithGenres(array $movies, array $genres): array
+{
+	$n = count($movies);
+	for ($i = 0; $i < $n; $i++)
+	{
+		$listGenres = explode(", ", $movies[$i]['GENRES']);
+		$listNameGenres = array_map(fn($value): string => $genres[$value]['NAME'], $listGenres);
+		$movies[$i]['GENRES'] = implode(", ", $listNameGenres);
+	}
+
+	return $movies;
+}
+
+function getMoviesById(mysqli $database, PDO $pdo, int $id): array
+{
+	$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
+       			     (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
+       				 (SELECT GROUP_CONCAT(ACTOR_ID) FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
+			   FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID 
+			   WHERE m.ID = {$id}";
+
+	$result = mysqli_query($database, $query);
+	if (!$result)
+	{
+		trigger_error($database->error, E_USER_ERROR);
+	}
+	return mysqli_fetch_assoc($result);
+}
+
+function getListActors(mysqli $database, PDO $pdo): array
+{
+	$query = "SELECT * FROM actor";
+
+	$result = $pdo->query($query);
+	if (!$result)
+	{
+		trigger_error($database->error, E_USER_ERROR);
+	}
+
+	return $result->fetchAll(PDO::FETCH_UNIQUE);
+}
+
+function getListMoviesWithActors(array $movies, array $actors): array
+{
+	$n = count($movies);
+	for ($i = 0; $i < $n; $i++)
+	{
+		$listActors = explode(", ", $movies[$i]['ACTORS']);
+		$listNameActors = array_map(fn($value): string => $actors[$value]['NAME'], $listActors);
+		$movies[$i]['ACTORS'] = implode(", ", $listNameActors);
+	}
+
+	return $movies;
+}
 
 //общие функции
-
-function getMoviesByGenres(array $movies, string $genre): array
-{
-	return array_filter($movies, function($movie) use ($genre){
-		return in_array($genre, $movie['genres']);
-	});
-}
-
-function getMoviesById(array $movies, int $id): array
-{
-	foreach ($movies as $movie)
-	{
-		if($movie['id'] === $id)
-		{
-			return $movie;
-		}
-	}
-	return [];
-}
 
 function getAllValuesByKey(array $movies, string $key): array
 {
@@ -52,10 +130,9 @@ function getAllValuesByKey(array $movies, string $key): array
 	return $result;
 }
 
-function formatGenreList(array $genres): string
+function formatGenreList(string $genres): string
 {
-	$result = implode(", ", array_values($genres));
-	return mb_strlen($result, 'UTF-8') <= 30? $result : formatMessage($result, 27);
+	return mb_strlen($genres, 'UTF-8') <= 30? $genres : formatMessage($genres, 27);
 }
 
 function createRectangleByMoviesRating(int $i, float $rating): string
