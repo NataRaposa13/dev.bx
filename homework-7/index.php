@@ -3,7 +3,6 @@ declare(strict_types=1);
 /** @var array $config */
 require_once "./config/app.php";
 /** @var array $movies */
-/** @var array $genres */
 require_once "./data/movies.php";
 require_once "./lib/template-functions.php";
 require_once "./lib/helper-functions.php";
@@ -11,6 +10,9 @@ require_once "./lib/movies-functions.php";
 require_once "./data/db.php";
 
 $database = connectToDB($config['db']);
+$pdo = connectPDO($config['db']);
+
+$genres = getListGenres($database, $pdo);
 
 // genre filtering
 if (isset($_GET['genre']) && in_array($_GET['genre'], array_values($genres)))
