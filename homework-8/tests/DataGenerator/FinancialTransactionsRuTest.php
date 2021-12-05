@@ -65,4 +65,67 @@ class FinancialTransactionsRuTest extends \PHPUnit\Framework\TestCase
 
 		static::assertEquals('ST00012|Name=|PersonalAcc=|BankName=|BIC=|CorrespAcc=', $data);
 	}
+
+
+	public function getGetDataDelimiterDefaultSamples(): array
+	{
+		return [
+			'empty' => [
+				[]
+			],
+			'filled without |' => [
+				['Персефона', '~', 'Деметра', '&', 'Зевс'],
+				['%', 'НДС']
+			],
+			'filled with |' => [
+				['|'],
+				['|', '~', '_', '#', '$' , '^', '&', '*', '/', '`', '@', '%']
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getGetDataDelimiterDefaultSamples
+	 *
+	 * @param array $fields
+	 */
+	public function testGetDataDelimiterDefault(array $fields): void
+	{
+		$dataGenerator = new \App\DataGenerator\FinancialTransactionsRu();
+
+		$dataGenerator->setFields($fields);
+
+		$data = $dataGenerator->getData();
+
+		static::assertStringContainsString('|', mb_substr($data, 0, 8));
+	}
+
+
+	public function getGetDataChangeDelimiterSamples(): array
+	{
+		return [
+			'filled with |' => [
+				['Персефона', '_', 'Аид', '|', 'Зевс'],
+				['%', 'НДС', '|']
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getGetDataChangeDelimiterSamples
+	 *
+	 * @param array $fields
+	 */
+	public function testGetDataChangeDelimiter(array $fields): void
+	{
+		$dataGenerator = new \App\DataGenerator\FinancialTransactionsRu();
+
+		$dataGenerator->setFields($fields);
+
+		$data = $dataGenerator->getData();
+		$delimiter = mb_substr($data, 7, 1);
+		$possibleDelimiters = ['|', '~', '_', '#', '$' , '^', '&', '*', '/', '`', '@', '%'];
+
+		static::assertNotEquals('|', $delimiter) && static::assertContains($delimiter, $possibleDelimiters);
+	}
 }
