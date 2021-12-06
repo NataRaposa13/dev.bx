@@ -7,17 +7,10 @@ require_once "./lib/helper-functions.php";
 require_once "./lib/movies-functions.php";
 require_once "./data/db.php";
 
-$database = connectToDB($config['db']);
-$pdo = connectPDO($config['db']);
+$database = connectPDOToDB($config['db']);
 
-$genres = getListGenres($database, $pdo);
-$movies = getListMovies($database, $pdo, $genres);
-
-// genre filtering
-if (isset($_GET['genre']) && in_array($_GET['genre'], array_values(getListCodeGenres($database, $pdo))))
-{
-	$movies = getListMovies($database, $pdo, $genres, $_GET['genre']);
-}
+$genres = getListGenres($database);
+$movies = getListMoviesByGenre($database, checkGetGenreIsCorrect($genres, $_GET['genre']), $_GET['genre']);
 
 // prepare page content
 $moviesListPage = renderTemplate("./resources/pages/movies-list.php",
