@@ -1,6 +1,6 @@
 <?php
 
-function getListGenres(mysqli $database, PDO $pdo, $page = 1, $pageSize = 50): array
+function getListGenres(PDO $database, $page = 1, $pageSize = 50): array
 {
 	$query = "SELECT * FROM genre";
 
@@ -8,69 +8,82 @@ function getListGenres(mysqli $database, PDO $pdo, $page = 1, $pageSize = 50): a
 	$limit = $pageSize;
 	$query .= " LIMIT {$limit} OFFSET {$offset}";
 
-	$result = $pdo->query($query);
-	if (!$result)
-	{
-		trigger_error($database->error, E_USER_ERROR);
+	try {
+		$result = $database->query($query);
+	} catch (\PDOException $e) {
+		throw new \PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
 	return $result->fetchAll(PDO::FETCH_UNIQUE);
 }
 
-function getListCodeGenres(mysqli $database, PDO $pdo): array
+function checkGetGenreIsCorrect(array $genres, string $genre = null): bool
 {
-	$query = "SELECT CODE FROM genre";
-
-	$result = $pdo->query($query);
-	if (!$result)
-	{
-		trigger_error($database->error, E_USER_ERROR);
-	}
-
-	return $result->fetchAll(PDO::FETCH_COLUMN);
+	return isset($genre) && in_array($genre, array_column($genres, 'CODE'));
 }
 
-function getListActors(mysqli $database, PDO $pdo): array
+function getListMovies(PDO $database): array
 {
-	$query = "SELECT * FROM actor";
+	$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
+					 (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
+					 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
+			  FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID";
 
-	$result = $pdo->query($query);
-	if (!$result)
-	{
-		trigger_error($database->error, E_USER_ERROR);
-	}
-
-	return $result->fetchAll(PDO::FETCH_UNIQUE);
-}
-
-function getListMovies(mysqli $database, PDO $pdo, array $genres, string $genre = null): array
-{
-	if ($genre === null)
-	{
-		$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
-       			         (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
-       					 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
-				  FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID";
-	}
-	else
-	{
-		$genre = mysqli_real_escape_string($database, $genre);
-		$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
-       					 (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
-       			 		 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
-				  FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID
-             				   INNER JOIN movie_genre mg ON m.ID = mg.MOVIE_ID
-             				   INNER JOIN genre g on mg.GENRE_ID = g.ID
-             	  WHERE CODE = '{$genre}'";
-	}
-
-	$result = $pdo->query($query);
-	if (!$result)
-	{
-		trigger_error($database->error, E_USER_ERROR);
+	try {
+		$result = $database->query($query);
+	} catch (\PDOException $e) {
+		throw new \PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
 	return $result->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getListMoviesByGenre(PDO $database, bool $isGenre = false, string $genre = null): array
+{
+	if (!$isGenre)
+	{
+		return getListMovies($database);
+	}
+
+	$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
+					 (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
+					 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
+			  FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID
+						   INNER JOIN movie_genre mg ON m.ID = mg.MOVIE_ID
+						   INNER JOIN genre g on mg.GENRE_ID = g.ID
+			  WHERE CODE = ?";
+
+	try {
+		$result = $database->prepare($query);
+		$result->execute([$genre]);
+	} catch (\PDOException $e) {
+		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	}
+
+	return $result->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getMoviesById(PDO $database, bool $isId = false, int $id = null): array
+{
+	if (!$isId)
+	{
+		return getListMovies($database);
+	}
+
+	$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
+       			     (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
+       				 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
+			   FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID 
+			   WHERE m.ID = ?";
+
+	try {
+		$result = $database->prepare($query);
+		$result->execute([$id]);
+	} catch (\PDOException $e) {
+		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	}
+
+	return call_user_func_array('array_merge', $result->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function getListMoviesWithGenres(array $movies, array $genres): array
@@ -86,29 +99,19 @@ function getListMoviesWithGenres(array $movies, array $genres): array
 	return $movies;
 }
 
-function getListMoviesWithActors(array $movie, array $actors): array
+function getListMoviesWithActors(PDO $database, array $movie, string $idActors): array
 {
-	$listActors = explode(", ", $movie['ACTORS']);
-	$listNameActors = array_map(fn($value): string => $actors[$value]['NAME'], $listActors);
-	$movie['ACTORS'] = implode(", ", $listNameActors);
+	$query = "SELECT * FROM actor WHERE ID IN ($idActors)";
+
+	try {
+		$result = $database->query($query);
+	} catch (\PDOException $e) {
+		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	}
+
+	$movie['ACTORS'] = implode(", ", array_values($result->fetchAll(PDO::FETCH_KEY_PAIR)));
 
 	return $movie;
-}
-
-function getMoviesById(mysqli $database, PDO $pdo, int $id): array
-{
-	$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
-       			     (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
-       				 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
-			   FROM movie m INNER JOIN director d ON m.DIRECTOR_ID = d.ID 
-			   WHERE m.ID = {$id}";
-
-	$result = mysqli_query($database, $query);
-	if (!$result)
-	{
-		trigger_error($database->error, E_USER_ERROR);
-	}
-	return mysqli_fetch_assoc($result);
 }
 
 //общие функции
