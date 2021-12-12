@@ -2,7 +2,7 @@
 
 namespace External;
 
-class VkAdvertsimentResult
+class VkAdvertisementResult
 {
 	public string $targetingName;
 
@@ -16,9 +16,9 @@ class VkAdvertsimentResult
 
 	/**
 	 * @param string $targetingName
-	 * @return VkAdvertsimentResult
+	 * @return VkAdvertisementResult
 	 */
-	public function setTargetingName(string $targetingName): VkAdvertsimentResult
+	public function setTargetingName(string $targetingName): VkAdvertisementResult
 	{
 		$this->targetingName = $targetingName;
 		return $this;

@@ -7,8 +7,8 @@ use Entity\AdvertisementResponse;
 
 interface AdvertisementProviderInterface
 {
-	public function publicate(Advertisement $advertsement): AdvertisementResponse;
-	public function prepare(Advertisement $advertsement);
-	public function check(Advertisement $advertsement);
-	public function calculateDuration(Advertisement $advertsement);
+	public function publish(Advertisement $advertisement): AdvertisementResponse;
+	public function prepare(Advertisement $advertisement);
+	public function check(Advertisement $advertisement);
+	public function calculateDuration(Advertisement $advertisement);
 }

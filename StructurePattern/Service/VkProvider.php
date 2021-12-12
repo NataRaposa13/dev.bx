@@ -9,27 +9,28 @@ use Entity\AdvertisementResponse;
 class VkProvider extends AbstractAdvertisementProvider
 {
 
-	public function publicate(Advertisement $advertsement): AdvertisementResponse
+	public function publish(Advertisement $advertisement): AdvertisementResponse
 	{
-		$advertsement->setBody($this->formatter->format($advertsement->getBody()));
-		echo $advertsement->getBody();
-		return (new VkAdvertisementProviderAdapter())->publicate($advertsement);
+		$advertisement->setBody($this->formatter->format($advertisement->getBody()));
+		echo $advertisement->getBody();
+		return (new VkAdvertisementProviderAdapter())->publish($advertisement);
 	}
 
-	public function prepare(Advertisement $advertsement)
+	public function prepare(Advertisement $advertisement)
 	{
-		if (!$advertsement->getTitle())
+		if (!$advertisement->getTitle())
 		{
-			$advertsement->setTitle("hello");
+			$advertisement->setTitle("hello");
 		}
 	}
 
-	public function check(Advertisement $advertsement)
+	public function check(Advertisement $advertisement)
 	{
 		// TODO: Implement check() method.
 	}
 
-	public function calculateDuration(Advertisement $advertsement)
+	public function calculateDuration(Advertisement $advertisement)
 	{
+		// TODO: Implement calculateDuration() method.
 	}
 }
