@@ -4,8 +4,8 @@ namespace App\Operation;
 
 class Settings
 {
-	protected $isBeforeActionsEnabled = true;
-	protected $isAfterActionsEnabled = true;
+	protected bool $isBeforeActionsEnabled = true;
+	protected bool $isAfterActionsEnabled = true;
 
 	public function disableBeforeSaveActions(): self
 	{

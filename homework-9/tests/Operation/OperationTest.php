@@ -170,4 +170,21 @@ class OperationTest extends TestCase
 
 		$operation->launch();
 	}
+
+	public function testThatOperationDoesNotInvokeAfterActionsIfTheyDisabledInSettings(): void
+	{
+		$settings = new App\Operation\Settings();
+
+		$settings->disableAfterSaveActions();
+
+		$order = $this->getOrderThatSavesSuccessfully();
+
+		$operation = new App\Operation\Operation($order, $settings);
+		$operation->addAction(
+			App\Operation\Operation::ACTION_AFTER_SAVE,
+			$this->getActionThatNeverInvoked()
+		);
+
+		$operation->launch();
+	}
 }
