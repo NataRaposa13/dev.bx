@@ -13,18 +13,14 @@ $genres = getListGenres($database);
 $movies = getListMoviesByGenre($database, checkGetGenreIsCorrect($genres, $_GET['genre']), $_GET['genre']);
 
 // prepare page content
-$moviesListPage = renderTemplate("./resources/pages/movies-list.php",
-	[
-		'movies' => getListMoviesWithGenres($movies, $genres)
-	]
-);
+$moviesListPage = renderTemplate("./resources/pages/movies-list.php", [
+	'movies' => getListMoviesWithGenres($movies, $genres)
+]);
 
 // render layout
-renderLayout($moviesListPage,
-	[
-		'config' => $config,
-		'genres' => $genres,
-		'currentPage' => getFileName(__FILE__),
-		'get' => $_GET
-	]
-);
+renderLayout($moviesListPage, [
+	'config' => $config,
+	'genres' => $genres,
+	'currentPage' => getFileName(__FILE__),
+	'get' => $_GET
+]);
