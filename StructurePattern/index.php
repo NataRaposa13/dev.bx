@@ -15,3 +15,13 @@ $calculator->applyCost();
 
 $calculator = new \Decorator\VatCostDecorator($calculator);
 var_dump($calculator->applyCost()->getTotalCost());
+
+
+$formatter = new \Service\Formatting\PlainTextFormatter($advertisement);
+var_dump($formatter->format("test1"));
+
+$formatter = (new \Decorator\HtmlTextDecorator($formatter))
+	->setTitleText("Внимание")
+	->setFooterText("Ждём вас");
+
+var_dump($formatter->format("test2"));
