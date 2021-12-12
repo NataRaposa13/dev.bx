@@ -9,21 +9,27 @@ require_once "./data/db.php";
 
 $database = connectPDOToDB($config['db']);
 
+$movies = null;
 $genres = getListGenres($database);
-$movies = getMoviesById($database, isset($_GET['id']), (int)$_GET['id']);
+
+if (is_numeric($_GET['id'] ?? null)) {
+	$movies = getMoviesById($database, (int) $_GET['id']);
+}
+
+if ($movies === null) {
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Location: index.php");
+	exit();
+}
 
 // prepare page content
-$moviesListPage = renderTemplate("./resources/pages/movie-details.php",
-	[
-		'movies' => getListMoviesWithActors($database, $movies, $movies['ACTORS'])
-	]
-);
+$moviesListPage = renderTemplate("./resources/pages/movie-details.php", [
+	'movies' => getListMoviesWithActors($database, $movies, $movies['ACTORS'])
+]);
 
 // render layout
-renderLayout($moviesListPage,
-	[
-		'config' => $config,
-		'genres' => $genres,
-		'currentPage' => getFileName(__FILE__)
-	]
-);
+renderLayout($moviesListPage, [
+	'config' => $config,
+	'genres' => $genres,
+	'currentPage' => getFileName(__FILE__)
+]);
