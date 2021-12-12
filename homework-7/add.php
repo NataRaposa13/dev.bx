@@ -7,10 +7,9 @@ require_once "./lib/helper-functions.php";
 require_once "./lib/movies-functions.php";
 require_once "./data/db.php";
 
-$database = connectToDB($config['db']);
-$pdo = connectPDO($config['db']);
+$database = connectPDOToDB($config['db']);
 
-$genres = getListGenres($database, $pdo);
+$genres = getListGenres($database);
 
 $text = "Скоро сможете добавить свой фильм";
 
