@@ -12,6 +12,15 @@ class Helper
 		$vkProvider->check($advertisement);
 		$vkProvider->calculateDuration($advertisement);
 		$vkProvider->prepare($advertisement);
-		$vkProvider->publicate($advertisement);
+		$vkProvider->publish($advertisement);
+	}
+
+	public static function runFacebookAdvertisement(Advertisement $advertisement)
+	{
+		$facebookProvider = new FacebookProvider((new \Service\Formatting\PlainTextFormatter()));
+		$facebookProvider->check($advertisement);
+		$facebookProvider->calculateDuration($advertisement);
+		$facebookProvider->prepare($advertisement);
+		$facebookProvider->publish($advertisement);
 	}
 }
