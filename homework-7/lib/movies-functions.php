@@ -6,12 +6,12 @@ function getListGenres(PDO $database, $page = 1, $pageSize = 50): array
 
 	$offset = $pageSize * ($page - 1);
 	$limit = $pageSize;
-	$query .= " LIMIT {$limit} OFFSET {$offset}";
+	$query .= " LIMIT $limit OFFSET $offset";
 
 	try {
 		$result = $database->query($query);
-	} catch (\PDOException $e) {
-		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	} catch (PDOException $e) {
+		throw new PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
 	return $result->fetchAll(PDO::FETCH_UNIQUE);
@@ -31,8 +31,8 @@ function getListMovies(PDO $database): array
 
 	try {
 		$result = $database->query($query);
-	} catch (\PDOException $e) {
-		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	} catch (PDOException $e) {
+		throw new PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
 	return $result->fetchAll(PDO::FETCH_ASSOC);
@@ -40,8 +40,7 @@ function getListMovies(PDO $database): array
 
 function getListMoviesByGenre(PDO $database, bool $isGenre = false, string $genre = null): array
 {
-	if (!$isGenre)
-	{
+	if (!$isGenre) {
 		return getListMovies($database);
 	}
 
@@ -56,20 +55,15 @@ function getListMoviesByGenre(PDO $database, bool $isGenre = false, string $genr
 	try {
 		$result = $database->prepare($query);
 		$result->execute([$genre]);
-	} catch (\PDOException $e) {
-		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	} catch (PDOException $e) {
+		throw new PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
 	return $result->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function getMoviesById(PDO $database, bool $isId = false, int $id = null): array
+function getMoviesById(PDO $database, int $id = null): ?array
 {
-	if (!$isId)
-	{
-		return getListMovies($database);
-	}
-
 	$query = "SELECT m.ID, TITLE, ORIGINAL_TITLE, DESCRIPTION, DURATION, AGE_RESTRICTION, RELEASE_DATE, RATING, d.NAME DIRECTOR,
        			     (SELECT GROUP_CONCAT(GENRE_ID SEPARATOR ', ') FROM movie_genre WHERE movie_genre.MOVIE_ID = m.ID) GENRES,
        				 (SELECT GROUP_CONCAT(ACTOR_ID SEPARATOR ', ') FROM movie_actor WHERE movie_actor.MOVIE_ID = m.ID) ACTORS
@@ -79,11 +73,12 @@ function getMoviesById(PDO $database, bool $isId = false, int $id = null): array
 	try {
 		$result = $database->prepare($query);
 		$result->execute([$id]);
-	} catch (\PDOException $e) {
-		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+		$movie = $result->fetch(PDO::FETCH_ASSOC);
+	} catch (PDOException $e) {
+		throw new PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
-	return call_user_func_array('array_merge', $result->fetchAll(PDO::FETCH_ASSOC));
+	return $movie !== false ? $movie : null;
 }
 
 function getListMoviesWithGenres(array $movies, array $genres): array
@@ -105,8 +100,8 @@ function getListMoviesWithActors(PDO $database, array $movie, string $idActors):
 
 	try {
 		$result = $database->query($query);
-	} catch (\PDOException $e) {
-		throw new \PDOException($e->getMessage(), (int)$e->getCode());
+	} catch (PDOException $e) {
+		throw new PDOException($e->getMessage(), (int)$e->getCode());
 	}
 
 	$movie['ACTORS'] = implode(", ", array_values($result->fetchAll(PDO::FETCH_KEY_PAIR)));
@@ -116,19 +111,6 @@ function getListMoviesWithActors(PDO $database, array $movie, string $idActors):
 
 //общие функции
 
-function getAllValuesByKey(array $movies, string $key): array
-{
-	$result = [];
-	foreach ($movies as $movie)
-	{
-		if(array_key_exists($key, $movie))
-		{
-			$result[] = $movie[$key];
-		}
-	}
-	return $result;
-}
-
 function formatGenreList(string $genres): string
 {
 	return mb_strlen($genres, 'UTF-8') <= 30? $genres : formatMessage($genres, 27);
@@ -136,13 +118,10 @@ function formatGenreList(string $genres): string
 
 function createRectangleByMoviesRating(int $i, float $rating): string
 {
-	{
-		if ($i<=$rating){
-			return '<div style= "background:#E78818;"  class="rating-rectangle"></div>';
-		}
-		else
-		{
-			return '<div class="rating-rectangle"></div>';
-		}
+	if ($i<=$rating) {
+		return '<div style= "background:#E78818;"  class="rating-rectangle"></div>';
+	}
+	else {
+		return '<div class="rating-rectangle"></div>';
 	}
 }
